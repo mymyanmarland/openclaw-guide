@@ -1,0 +1,18 @@
+{
+  "models": {
+    "providers": {
+      "myprovider": {
+        "baseUrl": "https://api.example.com/v1",
+        "api": "openai-completions",
+        "models": [
+          { "id": "your-model-id", "name": "Your Model" }
+        ]
+      }
+    }
+  },
+  "agents": {
+    "defaults": {
+      "model": { "primary": "myprovider/your-model-id" }
+    }
+  }
+}

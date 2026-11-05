@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="my">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OpenClaw — ၃ ဆင့်နဲ့ စတင်</title>
+<style>
+:root{--border:#e2e8f0;--text:#0f172a;--muted:#64748b}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,"Noto Sans Myanmar",sans-serif;background:#f8fafc;color:var(--text);line-height:1.6}
+.wrap{max-width:760px;margin:0 auto;padding:20px 16px 48px}
+.card{background:#fff;border:1px solid var(--border);border-radius:16px;box-shadow:0 1px 3px rgba(15,23,42,.06),0 8px 24px rgba(15,23,42,.06);padding:20px;position:relative;overflow:hidden}
+.liquid::before{content:"";position:absolute;inset:0 0 auto 0;height:50%;background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(255,255,255,0));pointer-events:none}
+.liquid::after{content:"";position:absolute;top:0;left:-60%;width:40%;height:100%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.5),transparent);transform:skewX(-18deg);transition:left .6s}
+.liquid:hover::after{left:120%}
+h1{font-size:29px;line-height:1.25;margin:8px 0}h2{font-size:19px;margin:0}
+p{color:#334155}.muted{color:var(--muted);font-size:14px}
+.badge{display:inline-block;background:#eef2ff;color:#4338ca;border:1px solid #ddd6fe;padding:4px 10px;border-radius:999px;font-size:13px;font-weight:700}
+.btn{display:inline-flex;border:0;cursor:pointer;text-decoration:none;font-weight:800;padding:11px 18px;border-radius:12px;color:#fff;background:linear-gradient(180deg,#c4b5fd,#7c3aed 55%,#6d28d9);box-shadow:inset 0 1px 0 rgba(255,255,255,.6),0 10px 20px rgba(124,58,237,.35)}
+.btn:active{transform:translateY(2px)}
+.step{display:flex;gap:14px;margin-top:16px}
+.num{flex:0 0 36px;height:36px;border-radius:50%;display:grid;place-items:center;background:#0f172a;color:#fff;font-weight:900}
+code{background:#f1f5f9;padding:2px 6px;border-radius:6px;word-break:break-all}
+.cmd{position:relative;background:#0f172a;color:#e2e8f0;border-radius:12px;padding:14px 54px 14px 14px;overflow:auto;margin:10px 0}
+.cmd code{background:none;padding:0;color:#86efac;font-family:ui-monospace,monospace}
+.copy{position:absolute;right:8px;top:8px;background:#fff;color:#0f172a;border:1px solid var(--border);padding:6px 10px;border-radius:999px;font-weight:700;cursor:pointer}
+.warn{background:#fefce8;border:1px solid #fde68a;padding:12px;border-radius:12px;color:#713f12;margin-top:16px}
+a{color:#7c3aed}
+</style>
+</head>
+<body><div class="wrap">
+<div class="card liquid">
+<span class="badge">⚡ မြန်မြန် • သွက်သွက်</span>
+<h1>OpenClaw — ၃ ဆင့်နဲ့ စတင်</h1>
+<p>အဆင့်တွေ များများ မလိုဘူး။ ဒီ ၃ ဆင့်ပဲ လုပ်ရင် ပြီးတယ်။</p>
+<div class="step"><div class="num">1</div><div><h2>Install လုပ်</h2><div class="cmd"><code>curl -fsSL https://openclaw.ai/install.sh | bash</code><button class="copy" onclick="copy(this)">Copy</button></div><span class="muted">Windows: PowerShell မှာ <code>iwr -useb https://openclaw.ai/install.ps1 | iex</code></span></div></div>
+<div class="step"><div class="num">2</div><div><h2>Custom Base URL ထည့်</h2><div class="cmd"><code>openclaw onboard --install-daemon</code><button class="copy" onclick="copy(this)">Copy</button></div><span class="muted">Wizard မှာ Custom Provider ရွေးပြီး Base URL, key, model ထည့်ပါ။</span></div></div>
+<div class="step"><div class="num">3</div><div><h2>သုံးတော့</h2><div class="cmd"><code>openclaw dashboard</code><button class="copy" onclick="copy(this)">Copy</button></div><span class="muted">Browser မှာ <code>http://127.0.0.1:18789/</code> ပွင့်လာမယ်။ Telegram လိုရင် <code>openclaw channels add --channel telegram --token "YOUR_BOT_TOKEN"</code></span></div></div>
+<p class="muted">လက်နဲ့ မလုပ်ချင်ရင် One-click script သုံးပါ။ <a href="index.html">အပြည့်အစုံ Guide</a> မှာ One-click tab ကြည့်ပါ။</p>
+<div class="warn">⚠️ port 18789 ကို public မဖွင့်ပါနဲ့။</div>
+<p><a class="btn" href="index.html">အပြည့်အစုံ Guide →</a></p>
+</div>
+</div>
+<script>
+function copy(btn){var t=btn.parentElement.querySelector('code').innerText;if(navigator.clipboard){navigator.clipboard.writeText(t).then(function(){btn.innerText='Copied ✓';setTimeout(function(){btn.innerText='Copy'},1500)})}}
+</script>
+</body>
+</html>

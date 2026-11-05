@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="my">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OpenClaw Guide — VPS, Custom Base URL, GUI, Telegram, Windows, Linux, Browser Control</title>
+<meta name="description" content="OpenClaw ကို VPS ပေါ်မှာ Custom Base URL နဲ့ သုံးနည်း၊ GUI နဲ့ Telegram ကနေ သုံးနည်း၊ Windows / Linux / VM မှာ သုံးနည်း၊ Browser Control ပေးနည်းကို မြန်မာဘာသာဖြင့် လမ်းညွှန်။">
+<style>
+:root{--bg:#f8fafc;--card:#fff;--border:#e2e8f0;--text:#0f172a;--muted:#64748b;--primary:#7c3aed;--accent:#db2777}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,"Noto Sans Myanmar",sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+a{color:var(--primary)}
+.top{position:sticky;top:0;z-index:10;background:rgba(255,255,255,.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+.topin{max-width:920px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.logo{font-weight:900;letter-spacing:-.02em}.logo span{color:var(--accent)}
+.wrap{max-width:920px;margin:0 auto;padding:20px 16px 48px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;box-shadow:0 1px 3px rgba(15,23,42,.06),0 8px 24px rgba(15,23,42,.06);padding:20px}
+.liquid{position:relative;overflow:hidden}
+.liquid::before{content:"";position:absolute;inset:0 0 auto 0;height:56%;background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(255,255,255,0));pointer-events:none}
+.liquid::after{content:"";position:absolute;top:0;left:-60%;width:40%;height:100%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.55),transparent);transform:skewX(-18deg);transition:left .6s}
+.liquid:hover::after{left:120%}
+h1{font-size:30px;line-height:1.25;margin:8px 0}h2{font-size:21px;margin:0 0 8px}h3{font-size:17px;margin:16px 0 6px}
+p{color:#334155}.muted{color:var(--muted);font-size:15px}
+.badge{display:inline-block;background:#eef2ff;color:#4338ca;border:1px solid #ddd6fe;padding:4px 10px;border-radius:999px;font-size:13px;font-weight:700}
+.btn{display:inline-flex;align-items:center;gap:6px;border:0;cursor:pointer;text-decoration:none;font-weight:800;padding:11px 18px;border-radius:12px;color:#fff;background:linear-gradient(180deg,#c4b5fd,#7c3aed 55%,#6d28d9);box-shadow:inset 0 1px 0 rgba(255,255,255,.6),0 10px 20px rgba(124,58,237,.35);transition:transform .1s,box-shadow .1s}
+.btn:active{transform:translateY(2px);box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 4px 10px rgba(124,58,237,.3)}
+.btn2{background:#fff;color:var(--text);border:1px solid var(--border);box-shadow:0 1px 3px rgba(15,23,42,.08)}
+.btn2:active{transform:translateY(1px)}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0}
+.mini{padding:16px}.mini b{font-size:22px}.mini p{margin:6px 0 0;font-size:14px}
+.steps{display:grid;gap:12px;margin-top:14px}
+.step{display:flex;gap:14px;align-items:flex-start}
+.num{flex:0 0 36px;height:36px;border-radius:50%;display:grid;place-items:center;background:#0f172a;color:#fff;font-weight:900}
+.seg{display:flex;gap:4px;background:#eef2ff;border:1px solid #e0e7ff;padding:4px;border-radius:12px;overflow-x:auto;margin:16px 0}
+.seg button{white-space:nowrap;border:0;background:transparent;padding:9px 13px;border-radius:9px;cursor:pointer;font-weight:700;color:#475569}
+.seg button.active{background:#fff;color:#0f172a;box-shadow:0 1px 4px rgba(15,23,42,.15)}
+.tab{display:none}.tab.active{display:block}
+code{background:#f1f5f9;padding:2px 6px;border-radius:6px;word-break:break-all;font-size:14px}
+.cmd{position:relative;background:#0f172a;color:#e2e8f0;border-radius:12px;padding:14px 54px 14px 14px;overflow:auto;margin:10px 0}
+.cmd code{background:none;padding:0;color:#86efac;font-family:ui-monospace,monospace}
+.copy{position:absolute;right:8px;top:8px;background:#fff;color:#0f172a;border:1px solid var(--border);padding:6px 10px;border-radius:999px;font-weight:700;cursor:pointer}
+.warn{background:#fefce8;border:1px solid #fde68a;padding:12px;border-radius:12px;color:#713f12}
+footer{color:var(--muted);font-size:14px;margin-top:20px}
+@media(max-width:700px){.grid{grid-template-columns:1fr}h1{font-size:25px}.topin{flex-wrap:wrap}}
+</style>
+</head>
+<body>
+<div class="top"><div class="topin"><div class="logo">OpenClaw <span>Guide</span></div><a class="btn" href="quick.html" style="padding:8px 14px">⚡ Quick Start</a></div></div>
+<div class="wrap">
+
+<div class="card liquid">
+<span class="badge">VPS • Custom Base URL • GUI • Telegram • Browser</span>
+<h1>OpenClaw ကို ၃ ဆင့်နဲ့ စတင်ပါ</h1>
+<p>လူတိုင်း ကြည့်ပြီး လုပ်လို့ရအောင် လုပ်ထားတဲ့ လမ်းညွှန်။ အဆင့်တွေ များများ မလိုဘူး။</p>
+<div class="steps">
+<div class="step"><div class="num">1</div><div><b>Install လုပ်</b><div class="cmd"><code>curl -fsSL https://openclaw.ai/install.sh | bash</code><button class="copy" onclick="copy(this)">Copy</button></div><span class="muted">Windows: PowerShell မှာ <code>iwr -useb https://openclaw.ai/install.ps1 | iex</code></span></div></div>
+<div class="step"><div class="num">2</div><div><b>Custom Base URL ထည့်</b><div class="cmd"><code>openclaw onboard --install-daemon</code><button class="copy" onclick="copy(this)">Copy</button></div><span class="muted">Wizard မှာ Custom Provider ရွေးပြီး Base URL, key, model ထည့်ပါ။</span></div></div>
+<div class="step"><div class="num">3</div><div><b>သုံးတော့</b><div class="cmd"><code>openclaw dashboard</code><button class="copy" onclick="copy(this)">Copy</button></div><span class="muted">Browser မှာ <code>http://127.0.0.1:18789/</code> ပွင့်လာမယ်။</span></div></div>
+</div>
+<p><a class="btn" href="quick.html">Quick Start Page →</a> <a class="btn btn2" href="openclaw-guide.pdf">PDF Download</a></p>
+</div>
+
+<div class="grid">
+<div class="card mini"><b>🔑</b><h3>ကိုယ့် API</h3><p>Base URL ကို ကိုယ်တိုင် ရွေးပါ။ key က ကိုယ့်ဆီမှာပဲ ရှိတယ်။</p></div>
+<div class="card mini"><b>💬</b><h3>GUI + Telegram</h3><p>Browser dashboard နဲ့ Telegram bot နှစ်မျိုးလုံးကနေ သုံးလို့ရတယ်။</p></div>
+<div class="card mini"><b>🖥️</b><h3>Windows / Linux / VM</h3><p>OS တိုင်းမှာ တူတဲ့ အလုပ်လုပ်ပုံနဲ့ သုံးလို့ရတယ်။</p></div>
+</div>
+
+<nav class="seg" id="tabs">
+<button class="active" data-tab="oneclick">⚡ One-click</button>
+<button data-tab="vps">VPS Install</button>
+<button data-tab="baseurl">Custom Base URL</button>
+<button data-tab="gui">GUI</button>
+<button data-tab="telegram">Telegram</button>
+<button data-tab="windows">Windows</button>
+<button data-tab="linux">Linux / VM</button>
+<button data-tab="browser">Browser</button>
+<button data-tab="security">Security</button>
+</nav>
+
+<section class="tab active card" id="oneclick">
+<h2>⚡ One-click Install</h2>
+<p>လက်နဲ့ တစ်ဆင့်ချင်း လုပ်စရာ မလိုဘူး။ script ကို run လိုက်ရင် install, Custom Base URL, backup, verify အကုန် လုပ်ပေးတယ်။</p>
+<p><b>Linux / VPS:</b></p>
+<div class="cmd"><code>bash scripts/install.sh --base-url https://api.example.com/v1 --model your-model-id</code><button class="copy" onclick="copy(this)">Copy</button></div>
+<p><b>Windows PowerShell:</b></p>
+<div class="cmd"><code>.\scripts\install.ps1 -BaseUrl https://api.example.com/v1 -Model your-model-id</code><button class="copy" onclick="copy(this)">Copy</button></div>
+<p class="muted">Script က လုပ်ပေးတာ။ ① official installer နဲ့ OpenClaw တင်တယ်။ ② key ကို <code>/models</code> နဲ့ စစ်တယ်။ ③ config ကို backup ယူပြီးမှ provider ထည့်တယ်။ ④ Telegram token ပေးရင် channel ထည့်တယ်။ ⑤ Gateway ကို စစ်တယ်။<br>အရင် စမ်းချင်ရင် <code>--dry-run</code> (Linux) / <code>-DryRun</code> (Windows) နဲ့ စမ်းပါ။ ဘာမှ မပြောင်းဘူး။</p>
+</section>
+
+<section class="tab card" id="vps">
+<h2>VPS ပေါ် Install</h2>
+<p>Ubuntu / Debian VPS, Node 24.16+ သို့မဟုတ် 26.1+ လိုတယ်။ installer က လိုရင် Node ကို သူ့ဟာသူ ထည့်ပေးတယ်။</p>
+<div class="cmd"><code>curl -fsSL https://openclaw.ai/install.sh | bash
+openclaw onboard --install-daemon
+openclaw gateway status</code><button class="copy" onclick="copy(this)">Copy</button></div>
+<p class="muted"><code>--install-daemon</code> က systemd user service အနေနဲ့ တင်ပေးတယ်။ reboot လုပ်လည်း ပြန် run တယ်။</p>
+</section>
+
+<section class="tab card" id="baseurl">
+<h2>Custom Base URL</h2>
+<p>OpenAI ပုံစံ provider မှာ base URL က <code>/v1</code> နဲ့ ဆုံးရတယ်။ ဥပမာ <code>https://api.example.com/v1</code>။ Ollama မှာ <code>http://127.0.0.1:11434</code> လို <code>/v1</code> မပါတဲ့ လိပ်စာ သုံးရတယ်။</p>
+<div class="cmd"><code>agents.defaults.model.primary = "myprovider/your-model-id"</code><button class="copy" onclick="copy(this)">Copy</button></div>
+<p class="muted">401 = key မှားတယ်။ 404 = base URL မှားတယ်။</p>
+</section>
+
+<section class="tab card" id="gui">
+<h2>GUI — Control UI</h2>
+<p>Local မှာ <code>openclaw dashboard</code> လို့ run ရင် <code>http://127.0.0.1:18789/</code> ပွင့်တယ်။ VPS ကို အဝေးကနေ သုံးချင်ရင် SSH tunnel, nginx + HTTPS + basic auth, ဒါမှမဟုတ် Tailscale ကို သုံးပါ။</p>
+<div class="cmd"><code>ssh -L 18789:127.0.0.1:18789 user@your-server-ip</code><button class="copy" onclick="copy(this)">Copy</button></div>
+</section>
+
+<section class="tab card" id="telegram">
+<h2>Telegram Bot</h2>
+<p>Telegram မှာ @BotFather ကို ဖွင့်ပါ။ <code>/newbot</code> လို့ ပို့ပြီး token ယူပါ။</p>
+<div class="cmd"><code>openclaw channels add --channel telegram --token "YOUR_BOT_TOKEN"
+openclaw gateway restart
+openclaw channels status --probe
+openclaw pairing approve telegram &lt;PAIRING-CODE&gt;</code><button class="copy" onclick="copy(this)">Copy</button></div>
+<p class="muted">Pairing code က ၁ နာရီ အတွင်း သက်တမ်းကုန်တယ်။ Token ကို ဘယ်သူနဲ့မှ မမျှပါနဲ့။</p>
+</section>
+
+<section class="tab card" id="windows">
+<h2>Windows</h2>
+<p><b>Hub:</b> Native app, admin မလိုဘူး။ <b>PowerShell:</b> အောက်က command နဲ့ တင်ပါ။ <b>WSL2:</b> Linux နည်းအတိုင်း တင်ပါ။</p>
+<div class="cmd"><code>iwr -useb https://openclaw.ai/install.ps1 | iex
+openclaw onboard --install-daemon
+openclaw dashboard</code><button class="copy" onclick="copy(this)">Copy</button></div>
+</section>
+
+<section class="tab card" id="linux">
+<h2>Linux / VM</h2>
+<p>Linux desktop မှာ Linux install နည်းအတိုင်း တင်ပါ။ VM မှာ သီးသန့် version မလိုဘူး။ VM ထဲက OS အတိုင်း Windows နည်း ဒါမှမဟုတ် Linux နည်းကို သုံးပါ။ VM ပိတ်ရင် Gateway ရပ်တယ်။</p>
+</section>
+
+<section class="tab card" id="browser">
+<h2>Browser Control</h2>
+<p><b>Managed profile:</b> OpenClaw က သူ့ဟာသူ ထိန်းတဲ့ Chromium ဖြစ်သည်။ ကိုယ့် personal browser နဲ့ မရောဘူး။ <b>Extension relay:</b> ကိုယ့် Chrome tab ကို attach လုပ်ပြီး ထိန်းတာဖြစ်သည်။ attach လုပ်ထားတဲ့ tab ကိုပဲ ထိန်းတယ်။</p>
+<div class="cmd"><code>openclaw browser install
+openclaw browser --browser-profile openclaw start
+openclaw browser --browser-profile openclaw open https://example.com</code><button class="copy" onclick="copy(this)">Copy</button></div>
+</section>
+
+<section class="tab card" id="security">
+<h2>Security</h2>
+<div class="warn">⚠️ port 18789 ကို public internet မှာ ဘယ်တော့မှ မဖွင့်ပါနဲ့။</div>
+<ul>
+<li><code>~/.openclaw/openclaw.json</code> backup ရှိတယ်။ permission 600 ဖြစ်သည်။</li>
+<li>API key, bot token ကို GitHub / chat / screenshot ထဲမှာ မတင်ထားဘူး။</li>
+<li>Gateway မတက်ဘူး — <code>openclaw gateway status</code>, <code>openclaw doctor</code> စစ်ပါ။</li>
+</ul>
+</section>
+
+<footer><p>OpenClaw Guide — MIT License. OpenClaw က open source project ဖြစ်သည်။ တကယ့် key တွေ၊ token တွေ ဒီ site မှာ မပါဘူး။</p></footer>
+</div>
+<script>
+document.querySelectorAll('#tabs button').forEach(function(b){
+  b.addEventListener('click', function(){
+    document.querySelectorAll('#tabs button').forEach(function(x){x.classList.remove('active')});
+    document.querySelectorAll('.tab').forEach(function(x){x.classList.remove('active')});
+    b.classList.add('active');document.getElementById(b.dataset.tab).classList.add('active');
+  });
+});
+function copy(btn){var t=btn.parentElement.querySelector('code').innerText;if(navigator.clipboard){navigator.clipboard.writeText(t).then(function(){btn.innerText='Copied ✓';setTimeout(function(){btn.innerText='Copy'},1500)})}}
+</script>
+</body>
+</html>

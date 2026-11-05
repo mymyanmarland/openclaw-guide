@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="160" viewBox="0 0 1200 160" role="img" aria-label="Install to use flow">
+  <rect x="20" y="50" width="200" height="60" rx="12" fill="#005e62"/><text x="120" y="88" text-anchor="middle" font-family="Arial" font-size="20" fill="#fff">Install</text>
+  <rect x="280" y="50" width="200" height="60" rx="12" fill="#0ea5a5"><text x="380" y="88" text-anchor="middle" font-family="Arial" font-size="20" fill="#fff">Custom Base URL</text></rect>
+  <rect x="540" y="50" width="200" height="60" rx="12" fill="#005e62"><text x="640" y="88" text-anchor="middle" font-family="Arial" font-size="20" fill="#fff">GUI / Telegram</text></rect>
+  <rect x="800" y="50" width="200" height="60" rx="12" fill="#0ea5a5"><text x="880" y="88" text-anchor="middle" font-family="Arial" font-size="20" fill="#fff">Browser Control</text></rect>
+  <rect x="1040" y="50" width="140" height="60" rx="12" fill="#ffd166"><text x="1110" y="88" text-anchor="middle" font-family="Arial" font-size="20" fill="#0b1026">Use it</text></rect>
+  <path d="M220 80 H280 M480 80 H540 M740 80 H800 M1000 80 H1040" stroke="#0b1026" stroke-width="3" marker-end="url(#a)"/>
+  <defs><marker id="a" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6" fill="#0b1026"/></marker></defs>
+</svg>
