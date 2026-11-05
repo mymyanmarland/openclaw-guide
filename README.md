@@ -4,7 +4,7 @@
 
 > OpenClaw ကို VPS ပေါ်မှာ Custom Base URL API နဲ့ သုံးနည်း၊ GUI နဲ့ Telegram ကနေ သုံးနည်း၊ Windows / Linux / VM မှာ သုံးနည်း၊ Browser Control ပေးနည်းကို မြန်မာဘာသာဖြင့် အပြည့်အစုံ ရေးထားတဲ့ လမ်းညွှန်။
 
-**Website (draft, not yet live):** https://openclaw-guide.funapp.live
+**Website:** https://openclaw-guide.funapp.live
 **PDF:** [site/openclaw-guide.pdf](site/openclaw-guide.pdf)
 
 ![Flow](assets/flow.svg)
