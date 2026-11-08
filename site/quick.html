@@ -35,7 +35,7 @@ a{color:#7c3aed}
 <h1>OpenClaw — ၃ ဆင့်နဲ့ စတင်</h1>
 <p>အဆင့်တွေ များများ မလိုဘူး။ ဒီ ၃ ဆင့်ပဲ လုပ်ရင် ပြီးတယ်။</p>
 <div class="step"><div class="num">1</div><div><h2>Install လုပ်</h2><div class="cmd"><code>curl -fsSL https://openclaw.ai/install.sh | bash</code><button class="copy" onclick="copy(this)">Copy</button></div><span class="muted">Windows: PowerShell မှာ <code>iwr -useb https://openclaw.ai/install.ps1 | iex</code></span></div></div>
-<div class="step"><div class="num">2</div><div><h2>Custom Base URL ထည့်</h2><div class="cmd"><code>openclaw onboard --install-daemon</code><button class="copy" onclick="copy(this)">Copy</button></div><span class="muted">Wizard မှာ Custom Provider ရွေးပြီး Base URL, key, model ထည့်ပါ။</span></div></div>
+<div class="step"><div class="num">2</div><div><h2>Custom Base URL ထည့်</h2><div class="cmd"><code>openclaw onboard --classic --install-daemon</code><button class="copy" onclick="copy(this)">Copy</button></div><span class="muted">Wizard မှာ Custom Provider ရွေးပြီး Base URL, key, model ထည့်ပါ။ (Custom Provider only appears with --classic.)</span></div></div>
 <div class="step"><div class="num">3</div><div><h2>သုံးတော့</h2><div class="cmd"><code>openclaw dashboard</code><button class="copy" onclick="copy(this)">Copy</button></div><span class="muted">Browser မှာ <code>http://127.0.0.1:18789/</code> ပွင့်လာမယ်။ Telegram လိုရင် <code>openclaw channels add --channel telegram --token "YOUR_BOT_TOKEN"</code></span></div></div>
 <p class="muted">လက်နဲ့ မလုပ်ချင်ရင် One-click script သုံးပါ။ <a href="index.html">အပြည့်အစုံ Guide</a> မှာ One-click tab ကြည့်ပါ။</p>
 <div class="warn">⚠️ port 18789 ကို public မဖွင့်ပါနဲ့။</div>
