@@ -31,7 +31,7 @@ Linux / macOS / WSL2:
 
 ```bash
 curl -fsSL https://openclaw.ai/install.sh | bash
-openclaw onboard --install-daemon
+openclaw onboard --classic --install-daemon
 openclaw gateway status
 openclaw dashboard
 ```
@@ -53,7 +53,7 @@ OpenClaw မှာ provider တစ်ခု ကို `~/.openclaw/openclaw.json
       "myprovider": {
         "baseUrl": "https://api.example.com/v1",
         "api": "openai-completions",
-        "models": [{ "id": "your-model-id" }]
+        "models": [{ "id": "your-model-id", "name": "your-model-id" }]
       }
     }
   },
@@ -83,11 +83,15 @@ MIT — လူတိုင်း သုံးနိုင်တယ်၊ ပြ�
 
 Linux:
 ```bash
+git clone https://github.com/mymyanmarland/openclaw-guide.git
+cd openclaw-guide
 bash scripts/install.sh --base-url https://api.example.com/v1 --model your-model-id
 ```
 
 Windows PowerShell:
 ```powershell
+git clone https://github.com/mymyanmarland/openclaw-guide.git
+cd openclaw-guide
 .\scripts\install.ps1 -BaseUrl https://api.example.com/v1 -Model your-model-id
 ```
 
