@@ -103,4 +103,4 @@ cd openclaw-guide
 .\scripts\install.ps1 -BaseUrl https://api.example.com/v1 -Model your-model-id
 ```
 
-Script က official installer, key verify, config backup, provider merge, Telegram (optional), gateway start, wait until ready, channel probe အကုန် လုပ်ပေးတယ်။ အရင် စမ်းချင်ရင် `--dry-run` / `-DryRun` နဲ့ စမ်းပါ။
+Script က official installer, key verify, config backup, provider merge, Telegram (optional), gateway start, wait until ready, API key ကို auth store ထဲ သိမ်း, channel probe အကုန် လုပ်ပေးတယ်။ အရင် စမ်းချင်ရင် `--dry-run` / `-DryRun` နဲ့ စမ်းပါ။
