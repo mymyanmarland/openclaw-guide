@@ -146,6 +146,16 @@ cfg.setdefault("models", {}).setdefault("providers", {})[os.environ["OPENCLAW_PR
 cfg.setdefault("agents", {}).setdefault("defaults", {}).setdefault("model", {})["primary"] = (
     f"{os.environ['OPENCLAW_PROVIDER']}/{os.environ['OPENCLAW_MODEL']}"
 )
+# A fresh config also needs at least one agent entry, or the gateway
+# refuses to start ("agents.entries must contain at least one
+# configured agent"). Onboard normally creates "main"; a hand-written
+# config has none. Preserve an existing entry, only fill what's missing.
+entries = cfg.setdefault("agents", {}).setdefault("entries", {})
+main = entries.setdefault("main", {})
+main.setdefault("workspace", os.path.expanduser("~/.openclaw/workspace"))
+if not entries:
+    print("ERROR: no agent entry in config after merge.", file=sys.stderr)
+    sys.exit(3)
 with open(path, "w", encoding="utf-8") as f:
     json.dump(cfg, f, indent=2)
     f.write("\n")
