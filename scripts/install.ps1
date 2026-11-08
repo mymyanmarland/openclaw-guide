@@ -4,10 +4,10 @@
 #   - optionally a Telegram bot token (prompt, or $env:TELEGRAM_BOT_TOKEN)
 # The script then does everything: install, key/model verify, config
 # backup + provider write (with model name, required by OpenClaw
-# 2026.11.1+), config validate, Telegram channel, gateway start,
-# wait until the gateway answers, save the API key to OpenClaw's auth
-# store (inference reads the auth profile, not the config), channel
-# probe, and a short summary.
+# 2026.11.1+), config validate, Telegram channel, save the API key to
+# OpenClaw's auth store (offline — the gateway must be stopped for
+# this, it is restarted right after), gateway start,
+# wait until the gateway answers, channel probe, and a short summary.
 # Keys are never printed.
 #
 # Usage:
@@ -41,6 +41,22 @@ function Wait-Gateway {
     $waited += 5
     Write-Host "Waiting for the gateway to answer... ($waited sec / $MaxSeconds sec)"
     Start-Sleep -Seconds 5
+  }
+  return $false
+}
+
+function Test-PortOpen {
+  param([int]$Port = 18789)
+  $c = New-Object System.Net.Sockets.TcpClient
+  try { $c.Connect('127.0.0.1', $Port); return $true } catch { return $false } finally { $c.Close() }
+}
+
+function Stop-Gateway {
+  # Stop a running gateway and wait until port 18789 is quiet.
+  try { openclaw gateway stop } catch {}
+  for ($i = 0; $i -lt 12; $i++) {
+    if (-not (Test-PortOpen)) { return $true }
+    Start-Sleep -Seconds 2
   }
   return $false
 }
@@ -152,7 +168,28 @@ if ($telegramToken) {
   }
 }
 
-# 5. Start the gateway and wait until it answers. No manual step after this.
+# 5. Save the API key to OpenClaw's auth store — OFFLINE, before the
+# gateway starts. The CLI cannot write the auth profile while the
+# gateway owns the state: it fails with "local backend shared auth
+# requires ... OPENCLAW_GATEWAY_TOKEN ..." So stop the gateway first
+# if it is running, save the key, then start it again in step 6.
+# (Verified 2026-11-08 on OpenClaw 2026.11.1: paste while running
+# exits 1; paste offline exits 0 and creates <provider>:manual.)
+# Do NOT put the key in models.providers.<id>.apiKey: OpenClaw reports
+# it "unresolved in the active runtime snapshot".
+if (Test-GatewayReady) {
+  Write-Host 'Stopping the gateway briefly to save the API key...'
+  if (-not (Stop-Gateway)) { Write-Host 'Warning: could not stop the gateway; the API key save may fail.' }
+}
+Write-Host 'Saving the API key to OpenClaw auth store...'
+$apiKey | openclaw models auth paste-api-key --provider $Provider
+if ($LASTEXITCODE -eq 0) {
+  Write-Host 'API key saved to the auth store.'
+} else {
+  Write-Host "Warning: could not save the API key to the auth store. The agent will not be able to answer until you run this with the gateway stopped: openclaw models auth paste-api-key --provider $Provider"
+}
+
+# 6. Start the gateway and wait until it answers. No manual step after this.
 if (Test-GatewayReady) {
   Write-Host 'Gateway is already running. Restarting it so the new config loads...'
   try { openclaw gateway restart } catch {}
@@ -163,21 +200,7 @@ if (Test-GatewayReady) {
   if (-not (Wait-Gateway -MaxSeconds 150)) { throw 'Gateway did not come up. Run "openclaw gateway status --deep" and check the gateway log.' }
 }
 
-# 5b. Save the API key to OpenClaw's auth store. Verifying the key
-# against /models only proves it is valid — the agent signs in to the
-# AI service from the auth profile, not from the config. Without this
-# step the bot replies "Couldn't sign in to the AI service." Do NOT
-# put the key in models.providers.<id>.apiKey: OpenClaw reports it
-# "unresolved in the active runtime snapshot".
-Write-Host 'Saving the API key to OpenClaw auth store...'
-$apiKey | openclaw models auth paste-api-key --provider $Provider
-if ($LASTEXITCODE -eq 0) {
-  Write-Host 'API key saved to the auth store.'
-} else {
-  Write-Host "Warning: could not save the API key to the auth store. The agent will not be able to answer until you run: openclaw models auth paste-api-key --provider $Provider"
-}
-
-# 6. Probe channels (best effort — a failed probe does not undo the install).
+# 7. Probe channels (best effort — a failed probe does not undo the install).
 try { openclaw channels status --probe } catch {}
 
 Write-Host ''
