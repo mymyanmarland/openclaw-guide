@@ -71,7 +71,7 @@ try {
 if (-not $cfg.models) { $cfg | Add-Member -NotePropertyName models -NotePropertyValue ([pscustomobject]@{}) }
 if (-not $cfg.models.providers) { $cfg.models | Add-Member -NotePropertyName providers -NotePropertyValue ([pscustomobject]@{}) }
 $cfg.models.providers | Add-Member -NotePropertyName $Provider -NotePropertyValue ([pscustomobject]@{
-  baseUrl = $BaseUrl; api = 'openai-completions'; models = @(@{ id = $Model })
+  baseUrl = $BaseUrl; api = 'openai-completions'; models = @(@{ id = $Model; name = $Model })
 }) -Force
 if (-not $cfg.agents) { $cfg | Add-Member -NotePropertyName agents -NotePropertyValue ([pscustomobject]@{}) }
 if (-not $cfg.agents.defaults) { $cfg.agents | Add-Member -NotePropertyName defaults -NotePropertyValue ([pscustomobject]@{}) }
