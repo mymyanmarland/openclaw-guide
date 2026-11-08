@@ -112,7 +112,7 @@ except Exception as exc:
 cfg.setdefault("models", {}).setdefault("providers", {})[os.environ["OPENCLAW_PROVIDER"]] = {
     "baseUrl": os.environ["OPENCLAW_BASE_URL"],
     "api": "openai-completions",
-    "models": [{"id": os.environ["OPENCLAW_MODEL"]}],
+    "models": [{"id": os.environ["OPENCLAW_MODEL"], "name": os.environ["OPENCLAW_MODEL"]}],
 }
 cfg.setdefault("agents", {}).setdefault("defaults", {}).setdefault("model", {})["primary"] = (
     f"{os.environ['OPENCLAW_PROVIDER']}/{os.environ['OPENCLAW_MODEL']}"
