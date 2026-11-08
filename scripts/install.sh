@@ -56,11 +56,18 @@ gateway_ready() {
 wait_for_gateway() {
   # $1 = max seconds to wait (default 150). A cold gateway takes ~40s.
   # Prints progress every poll so the terminal never looks stuck.
+  # If $GATEWAY_LOG is set and the log says the gateway refused to
+  # start (e.g. a blocked config), fail fast instead of waiting it out.
   local max="${1:-150}" waited=0
   while [ "$waited" -lt "$max" ]; do
     if gateway_ready; then
       say "Gateway is up (listening on 127.0.0.1:18789)."
       return 0
+    fi
+    if [ -n "${GATEWAY_LOG:-}" ] && [ -f "$GATEWAY_LOG" ] && grep -q "Gateway start blocked" "$GATEWAY_LOG"; then
+      say "Gateway refused to start. The log says:"
+      grep -A1 "Gateway start blocked" "$GATEWAY_LOG" | tail -3
+      return 1
     fi
     waited=$((waited + 5))
     say "Waiting for the gateway to answer... (${waited}s / ${max}s)"
@@ -156,6 +163,13 @@ main.setdefault("workspace", os.path.expanduser("~/.openclaw/workspace"))
 if not entries:
     print("ERROR: no agent entry in config after merge.", file=sys.stderr)
     sys.exit(3)
+# The gateway also refuses to start without gateway.mode ("Gateway start
+# blocked: existing config is missing gateway.mode"). Onboard writes
+# mode=local; a hand-written config has none. Preserve existing values.
+gw = cfg.setdefault("gateway", {})
+gw.setdefault("mode", "local")
+gw.setdefault("bind", "loopback")
+gw.setdefault("port", 18789)
 with open(path, "w", encoding="utf-8") as f:
     json.dump(cfg, f, indent=2)
     f.write("\n")
@@ -202,7 +216,9 @@ else
   openclaw gateway start 2>/dev/null || true
   if ! wait_for_gateway 60; then
     say "Managed daemon did not start (no service manager here?). Starting the gateway in the background instead..."
-    nohup openclaw gateway run > /tmp/openclaw-gateway.log 2>&1 &
+    GATEWAY_LOG=/tmp/openclaw-gateway.log
+    : > "$GATEWAY_LOG"  # clear any stale log, so a blocked-start check reads this run only
+    nohup openclaw gateway run > "$GATEWAY_LOG" 2>&1 &
     wait_for_gateway 150 || die "Gateway did not come up. See /tmp/openclaw-gateway.log for the reason."
   fi
 fi
