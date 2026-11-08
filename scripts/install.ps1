@@ -117,6 +117,13 @@ if (-not $cfg.agents.entries.main) {
 if (-not $cfg.agents.entries.main.workspace) {
   $cfg.agents.entries.main | Add-Member -NotePropertyName workspace -NotePropertyValue (Join-Path $HOME '.openclaw\workspace') -Force
 }
+# The gateway also refuses to start without gateway.mode ("Gateway start
+# blocked: existing config is missing gateway.mode"). Onboard writes
+# mode=local; a hand-written config has none. Preserve existing values.
+if (-not $cfg.gateway) { $cfg | Add-Member -NotePropertyName gateway -NotePropertyValue ([pscustomobject]@{}) }
+if (-not $cfg.gateway.mode) { $cfg.gateway | Add-Member -NotePropertyName mode -NotePropertyValue 'local' }
+if (-not $cfg.gateway.bind) { $cfg.gateway | Add-Member -NotePropertyName bind -NotePropertyValue 'loopback' }
+if (-not $cfg.gateway.port) { $cfg.gateway | Add-Member -NotePropertyName port -NotePropertyValue 18789 }
 $cfg | ConvertTo-Json -Depth 10 | Set-Content $configFile -Encoding UTF8
 Write-Host "Wrote provider to $configFile. Primary model: $Provider/$Model"
 
