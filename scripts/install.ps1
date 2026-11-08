@@ -5,7 +5,9 @@
 # The script then does everything: install, key/model verify, config
 # backup + provider write (with model name, required by OpenClaw
 # 2026.11.1+), config validate, Telegram channel, gateway start,
-# wait until the gateway answers, channel probe, and a short summary.
+# wait until the gateway answers, save the API key to OpenClaw's auth
+# store (inference reads the auth profile, not the config), channel
+# probe, and a short summary.
 # Keys are never printed.
 #
 # Usage:
@@ -159,6 +161,20 @@ if (Test-GatewayReady) {
   try { openclaw gateway install } catch {}
   try { openclaw gateway start } catch {}
   if (-not (Wait-Gateway -MaxSeconds 150)) { throw 'Gateway did not come up. Run "openclaw gateway status --deep" and check the gateway log.' }
+}
+
+# 5b. Save the API key to OpenClaw's auth store. Verifying the key
+# against /models only proves it is valid — the agent signs in to the
+# AI service from the auth profile, not from the config. Without this
+# step the bot replies "Couldn't sign in to the AI service." Do NOT
+# put the key in models.providers.<id>.apiKey: OpenClaw reports it
+# "unresolved in the active runtime snapshot".
+Write-Host 'Saving the API key to OpenClaw auth store...'
+$apiKey | openclaw models auth paste-api-key --provider $Provider
+if ($LASTEXITCODE -eq 0) {
+  Write-Host 'API key saved to the auth store.'
+} else {
+  Write-Host "Warning: could not save the API key to the auth store. The agent will not be able to answer until you run: openclaw models auth paste-api-key --provider $Provider"
 }
 
 # 6. Probe channels (best effort — a failed probe does not undo the install).
