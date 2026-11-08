@@ -96,7 +96,7 @@ command -v python3 >/dev/null || die "python3 is required (used only to merge th
 # 1. Install OpenClaw itself (official installer only).
 if [ "$SKIP_INSTALL" = "0" ] && ! command -v openclaw >/dev/null 2>&1; then
   say "Installing OpenClaw (official installer)..."
-  curl -fsSL https://openclaw.ai/install.sh | bash -- --no-onboard
+  curl -fsSL https://openclaw.ai/install.sh | bash -s -- --no-onboard
 else
   say "OpenClaw already installed, or --skip-install given. Skipping official installer."
 fi
