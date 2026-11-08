@@ -107,6 +107,16 @@ if (-not $cfg.agents) { $cfg | Add-Member -NotePropertyName agents -NoteProperty
 if (-not $cfg.agents.defaults) { $cfg.agents | Add-Member -NotePropertyName defaults -NotePropertyValue ([pscustomobject]@{}) }
 if (-not $cfg.agents.defaults.model) { $cfg.agents.defaults | Add-Member -NotePropertyName model -NotePropertyValue ([pscustomobject]@{}) }
 $cfg.agents.defaults.model.primary = "$Provider/$Model"
+# A fresh config also needs at least one agent entry, or the gateway
+# refuses to start ("agents.entries must contain at least one
+# configured agent"). Preserve an existing entry, only fill what's missing.
+if (-not $cfg.agents.entries) { $cfg.agents | Add-Member -NotePropertyName entries -NotePropertyValue ([pscustomobject]@{}) }
+if (-not $cfg.agents.entries.main) {
+  $cfg.agents.entries | Add-Member -NotePropertyName main -NotePropertyValue ([pscustomobject]@{ workspace = (Join-Path $HOME '.openclaw\workspace') })
+}
+if (-not $cfg.agents.entries.main.workspace) {
+  $cfg.agents.entries.main | Add-Member -NotePropertyName workspace -NotePropertyValue (Join-Path $HOME '.openclaw\workspace') -Force
+}
 $cfg | ConvertTo-Json -Depth 10 | Set-Content $configFile -Encoding UTF8
 Write-Host "Wrote provider to $configFile. Primary model: $Provider/$Model"
 
