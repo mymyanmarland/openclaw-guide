@@ -5,10 +5,10 @@
 #   - optionally a Telegram bot token (hidden prompt, or TELEGRAM_BOT_TOKEN)
 # The script then does everything: install, key/model verify, config
 # backup + provider write (with model name, required by OpenClaw
-# 2026.11.1+), config validate, Telegram channel, gateway start,
-# wait until the gateway answers, save the API key to OpenClaw's auth
-# store (inference reads the auth profile, not the config), channel
-# probe, and a short summary.
+# 2026.11.1+), config validate, Telegram channel, save the API key to
+# OpenClaw's auth store (offline — the gateway must be stopped for
+# this, it is restarted right after), gateway start, wait until the
+# gateway answers, channel probe, and a short summary.
 # Keys are never printed and never written to git or shell history.
 #
 # Usage:
@@ -87,6 +87,22 @@ wait_for_gateway() {
   return 1
 }
 
+stop_gateway() {
+  # Stop a running gateway (managed daemon or background nohup) and wait
+  # until nothing answers on 127.0.0.1:18789. Returns 0 when the port is
+  # quiet, 1 on timeout. The gateway process is named "openclaw-gateway"
+  # (not "openclaw gateway run"); the [y] keeps pkill from matching a
+  # shell whose own command line contains the pattern text.
+  openclaw gateway stop 2>/dev/null || true
+  pkill -f "openclaw-gatewa[y]" 2>/dev/null || true
+  local i
+  for i in $(seq 1 12); do
+    if ! curl -s -m 2 -o /dev/null http://127.0.0.1:18789/; then return 0; fi
+    sleep 2
+  done
+  return 1
+}
+
 [ -n "$BASE_URL" ] || { printf 'Custom Base URL (e.g. https://api.example.com/v1): '; read -r BASE_URL; }
 [ -n "$MODEL_ID" ] || { printf 'Model ID (e.g. your-model-id): '; read -r MODEL_ID; }
 if [ -z "$API_KEY" ]; then
@@ -106,7 +122,7 @@ CONFIG_FILE="$CONFIG_DIR/openclaw.json"
 BACKUP_DIR="$CONFIG_DIR/backups"
 
 if [ "$DRY_RUN" = "1" ]; then
-  say "[dry-run] Would install OpenClaw (skip-install=$SKIP_INSTALL), verify $BASE_URL/models, back up $CONFIG_FILE, set primary model to $PROVIDER_NAME/$MODEL_ID, validate the config, add Telegram (if a token is given), start the gateway and wait until it answers, then probe channels. Nothing will change."
+  say "[dry-run] Would install OpenClaw (skip-install=$SKIP_INSTALL), verify $BASE_URL/models, back up $CONFIG_FILE, set primary model to $PROVIDER_NAME/$MODEL_ID, validate the config, add Telegram (if a token is given), save the API key to the auth store (gateway stopped), start the gateway and wait until it answers, then probe channels. Nothing will change."
   exit 0
 fi
 
@@ -213,7 +229,30 @@ if [ -n "${TELEGRAM_TOKEN:-}" ]; then
   unset TELEGRAM_TOKEN
 fi
 
-# 5. Start the gateway and wait until it answers. No manual step after
+# 5. Save the API key to OpenClaw's auth store — OFFLINE, before the
+# gateway starts. The CLI cannot write the auth profile while the
+# gateway owns the state: it fails with "local backend shared auth
+# requires ... OPENCLAW_GATEWAY_TOKEN ..." So stop the gateway first
+# if it is running, save the key, then start it again in step 6.
+# (Verified 2026-11-08 on OpenClaw 2026.11.1: paste while running
+# exits 1; paste offline exits 0 and creates <provider>:manual.)
+# Do NOT put the key in models.providers.<id>.apiKey: OpenClaw reports
+# it "unresolved in the active runtime snapshot".
+if gateway_ready; then
+  say "Stopping the gateway briefly to save the API key..."
+  stop_gateway || say "Warning: could not stop the gateway; the API key save may fail."
+fi
+say "Saving the API key to OpenClaw's auth store..."
+paste_rc=0
+paste_out="$(printf '%s' "$API_KEY" | openclaw models auth paste-api-key --provider "$PROVIDER_NAME" 2>&1)" || paste_rc=$?
+if [ "$paste_rc" -eq 0 ]; then
+  say "API key saved to the auth store."
+else
+  say "Warning: could not save the API key to the auth store. The agent will not be able to answer until you run this with the gateway stopped: openclaw models auth paste-api-key --provider $PROVIDER_NAME"
+  printf '%s\n' "$paste_out" | grep -v "DeprecationWarning" | grep -v "trace-deprecation" | tail -4 || true
+fi
+
+# 6. Start the gateway and wait until it answers. No manual step after
 # this script: on machines with a service manager the managed daemon
 # is used; without one (e.g. Cloud Shell) the gateway runs in the
 # background instead. A cold gateway takes ~40s to be ready.
@@ -240,22 +279,7 @@ else
   wait_for_gateway 150 || die "Gateway did not come up. See /tmp/openclaw-gateway.log for the reason."
 fi
 
-# 5b. Save the API key to OpenClaw's auth store. Verifying the key
-# against /models only proves it is valid — the agent signs in to the
-# AI service from the auth profile, not from the config. Without this
-# step the bot replies "Couldn't sign in to the AI service." Do NOT
-# put the key in models.providers.<id>.apiKey: OpenClaw reports it
-# "unresolved in the active runtime snapshot". Pipe the key on stdin
-# (the documented pattern); while the gateway is running the CLI
-# hands it to the gateway, which saves it without a restart.
-say "Saving the API key to OpenClaw's auth store..."
-if printf '%s' "$API_KEY" | openclaw models auth paste-api-key --provider "$PROVIDER_NAME" 2>/dev/null; then
-  say "API key saved to the auth store."
-else
-  say "Warning: could not save the API key to the auth store. The agent will not be able to answer until you run: openclaw models auth paste-api-key --provider $PROVIDER_NAME"
-fi
-
-# 6. Probe channels (best effort — a failed probe does not undo the install).
+# 7. Probe channels (best effort — a failed probe does not undo the install).
 openclaw channels status --probe 2>/dev/null || true
 
 say ""
