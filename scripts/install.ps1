@@ -1,6 +1,12 @@
-# OpenClaw Guide — One-click install (Windows PowerShell)
-# For a NEW machine, for everyone. Backs up $HOME\.openclaw\openclaw.json
-# before any change and never deletes the backup. Keys are never printed.
+# OpenClaw Guide — True one-click install (Windows PowerShell)
+# One command, no manual steps after it. You only supply:
+#   - an API key (hidden prompt, or $env:OPENCLAW_CUSTOM_API_KEY)
+#   - optionally a Telegram bot token (prompt, or $env:TELEGRAM_BOT_TOKEN)
+# The script then does everything: install, key/model verify, config
+# backup + provider write (with model name, required by OpenClaw
+# 2026.11.1+), config validate, Telegram channel, gateway start,
+# wait until the gateway answers, channel probe, and a short summary.
+# Keys are never printed.
 #
 # Usage:
 #   .\install.ps1
@@ -16,6 +22,26 @@ param(
 )
 $ErrorActionPreference = 'Stop'
 
+function Test-GatewayReady {
+  $out = try { openclaw gateway status 2>$null } catch { '' }
+  return ($out -match 'Connectivity check: ok') -or ($out -match 'Listening: 127.0.0.1:18789')
+}
+
+function Wait-Gateway {
+  param([int]$MaxSeconds = 150)
+  # A cold gateway takes ~40s to be ready.
+  $waited = 0
+  while ($waited -lt $MaxSeconds) {
+    if (Test-GatewayReady) {
+      Write-Host 'Gateway is up (listening on 127.0.0.1:18789).'
+      return $true
+    }
+    Start-Sleep -Seconds 5
+    $waited += 5
+  }
+  return $false
+}
+
 if (-not $BaseUrl) { $BaseUrl = Read-Host 'Custom Base URL (e.g. https://api.example.com/v1)' }
 if (-not $Model) { $Model = Read-Host 'Model ID (e.g. your-model-id)' }
 $apiKey = $env:OPENCLAW_CUSTOM_API_KEY
@@ -29,7 +55,7 @@ if (-not $Model) { throw 'Model ID is required.' }
 if (-not $apiKey) { throw 'API key is required.' }
 
 if ($DryRun) {
-  Write-Host "[dry-run] Would install OpenClaw (SkipInstall=$SkipInstall), verify $BaseUrl/models, back up openclaw.json, and set primary model to $Provider/$Model."
+  Write-Host "[dry-run] Would install OpenClaw (SkipInstall=$SkipInstall), verify $BaseUrl/models, back up openclaw.json, set primary model to $Provider/$Model, validate the config, add Telegram (if a token is given), start the gateway and wait until it answers, then probe channels. Nothing will change."
   exit 0
 }
 
@@ -39,6 +65,9 @@ if (-not $SkipInstall -and -not (Get-Command openclaw -ErrorAction SilentlyConti
   iwr -useb https://openclaw.ai/install.ps1 | iex
 } else {
   Write-Host 'OpenClaw already installed, or -SkipInstall given. Skipping official installer.'
+}
+if (-not (Get-Command openclaw -ErrorAction SilentlyContinue)) {
+  throw "'openclaw' is not on PATH after install. Reopen PowerShell, then rerun with -SkipInstall."
 }
 
 # 2. Verify the key + model before writing anything.
@@ -80,23 +109,49 @@ $cfg.agents.defaults.model.primary = "$Provider/$Model"
 $cfg | ConvertTo-Json -Depth 10 | Set-Content $configFile -Encoding UTF8
 Write-Host "Wrote provider to $configFile. Primary model: $Provider/$Model"
 
+# 3b. Validate the config now, so a bad config fails here — not later
+# at the dashboard or Telegram step.
+Write-Host 'Validating config...'
+openclaw config validate
+if ($LASTEXITCODE -ne 0) { throw 'Config is invalid after writing. Restore the backup in the backups folder and report this.' }
+Write-Host 'Config valid.'
+
 # 4. Telegram (optional).
 $telegramToken = $env:TELEGRAM_BOT_TOKEN
+$telegramAdded = $false
 if (-not $SkipTelegram -and -not $telegramToken) {
   $telegramToken = Read-Host 'Telegram bot token (optional, Enter to skip)'
 }
-if ($telegramToken -and (Get-Command openclaw -ErrorAction SilentlyContinue)) {
-  try { openclaw channels add --channel telegram --token $telegramToken } catch { Write-Host 'Warning: Telegram channel add failed. Check the token.' }
+if ($telegramToken) {
+  Write-Host 'Adding Telegram channel...'
+  openclaw channels add --channel telegram --token $telegramToken
+  if ($LASTEXITCODE -eq 0) {
+    $telegramAdded = $true
+  } else {
+    Write-Host 'Warning: Telegram channel add failed. Check the token and rerun: openclaw channels add --channel telegram --token <TOKEN>'
+  }
 }
 
-# 5. Gateway service + status.
-if (Get-Command openclaw -ErrorAction SilentlyContinue) {
+# 5. Start the gateway and wait until it answers. No manual step after this.
+if (Test-GatewayReady) {
+  Write-Host 'Gateway is already running. Restarting it so the new config loads...'
+  try { openclaw gateway restart } catch {}
+  if (-not (Wait-Gateway -MaxSeconds 150)) { throw 'Gateway did not come back up after restart. Run "openclaw gateway status --deep" and check the gateway log.' }
+} else {
   try { openclaw gateway install } catch {}
-  try { openclaw gateway status } catch { Write-Host "Run 'openclaw gateway status' and 'openclaw dashboard' to check the gateway." }
+  try { openclaw gateway start } catch {}
+  if (-not (Wait-Gateway -MaxSeconds 150)) { throw 'Gateway did not come up. Run "openclaw gateway status --deep" and check the gateway log.' }
 }
+
+# 6. Probe channels (best effort — a failed probe does not undo the install).
+try { openclaw channels status --probe } catch {}
 
 Write-Host ''
-Write-Host 'Done. Next:'
-Write-Host '  1. Run: openclaw dashboard   (opens http://127.0.0.1:18789/)'
-Write-Host '  2. If you added Telegram: message your bot, then approve pairing.'
-Write-Host '  3. Never expose port 18789 to the public internet.'
+Write-Host 'Done. OpenClaw is running.'
+Write-Host '  Dashboard: http://127.0.0.1:18789/'
+Write-Host '    - On this machine, run: openclaw dashboard'
+Write-Host '    - The dashboard asks for a token. Get it with: openclaw gateway auth-token --show  (never share it)'
+if ($telegramAdded) {
+  Write-Host '  Telegram: message your bot, then approve pairing with: openclaw pairing approve telegram <CODE>'
+}
+Write-Host '  Never expose port 18789 to the public internet.'
