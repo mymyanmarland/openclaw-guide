@@ -53,6 +53,15 @@ gateway_ready() {
   return 1
 }
 
+# True only on machines with a real service manager (systemd on Linux,
+# launchd on macOS). Cloud Shell / containers have none, so the managed
+# daemon can never start there — waiting 60s for it is wasted time.
+has_service_manager() {
+  local init
+  init="$(ps -p 1 -o comm= 2>/dev/null | tr -d ' ')"
+  [ "$init" = "systemd" ] || [ "$init" = "launchd" ]
+}
+
 wait_for_gateway() {
   # $1 = max seconds to wait (default 150). A cold gateway takes ~40s.
   # Prints progress every poll so the terminal never looks stuck.
@@ -210,17 +219,23 @@ if gateway_ready; then
   say "Gateway is already running. Restarting it so the new config loads..."
   openclaw gateway restart 2>/dev/null || true
   wait_for_gateway 150 || die "Gateway did not come back up after restart. Run 'openclaw gateway status --deep' and check /tmp/openclaw/openclaw-$(date +%Y-%m-%d).log"
-else
+elif has_service_manager; then
   say "Starting the gateway (a cold start takes ~40s, please wait)..."
   openclaw gateway install 2>/dev/null || true
   openclaw gateway start 2>/dev/null || true
   if ! wait_for_gateway 60; then
-    say "Managed daemon did not start (no service manager here?). Starting the gateway in the background instead..."
+    say "Managed daemon did not start. Starting the gateway in the background instead..."
     GATEWAY_LOG=/tmp/openclaw-gateway.log
     : > "$GATEWAY_LOG"  # clear any stale log, so a blocked-start check reads this run only
     nohup openclaw gateway run > "$GATEWAY_LOG" 2>&1 &
     wait_for_gateway 150 || die "Gateway did not come up. See /tmp/openclaw-gateway.log for the reason."
   fi
+else
+  say "No service manager here (Cloud Shell / container), so starting the gateway in the background straight away..."
+  GATEWAY_LOG=/tmp/openclaw-gateway.log
+  : > "$GATEWAY_LOG"  # clear any stale log, so a blocked-start check reads this run only
+  nohup openclaw gateway run > "$GATEWAY_LOG" 2>&1 &
+  wait_for_gateway 150 || die "Gateway did not come up. See /tmp/openclaw-gateway.log for the reason."
 fi
 
 # 6. Probe channels (best effort — a failed probe does not undo the install).
