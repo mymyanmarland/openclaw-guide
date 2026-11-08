@@ -8,7 +8,7 @@ Native Windows app ဖြစ်သည်။ admin မလိုဘဲ install လ
 ## 2. PowerShell native CLI
 ```powershell
 iwr -useb https://openclaw.ai/install.ps1 | iex
-openclaw onboard --install-daemon
+openclaw onboard --classic --install-daemon
 openclaw dashboard
 ```
 
