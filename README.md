@@ -64,6 +64,11 @@ OpenClaw မှာ provider တစ်ခု ကို `~/.openclaw/openclaw.json
     "entries": {
       "main": { "workspace": "~/.openclaw/workspace" }
     }
+  },
+  "gateway": {
+    "mode": "local",
+    "bind": "loopback",
+    "port": 18789
   }
 }
 ```
