@@ -60,6 +60,9 @@ OpenClaw မှာ provider တစ်ခု ကို `~/.openclaw/openclaw.json
   "agents": {
     "defaults": {
       "model": { "primary": "myprovider/your-model-id" }
+    },
+    "entries": {
+      "main": { "workspace": "~/.openclaw/workspace" }
     }
   }
 }
