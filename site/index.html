@@ -5,66 +5,150 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>OpenClaw Guide — VPS, Custom Base URL, GUI, Telegram, Windows, Linux, Browser Control</title>
 <meta name="description" content="OpenClaw ကို VPS ပေါ်မှာ Custom Base URL နဲ့ သုံးနည်း၊ GUI နဲ့ Telegram ကနေ သုံးနည်း၊ Windows / Linux / VM မှာ သုံးနည်း၊ Browser Control ပေးနည်းကို မြန်မာဘာသာဖြင့် လမ်းညွှန်။">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <style>
-:root{--bg:#f8fafc;--card:#fff;--border:#e2e8f0;--text:#0f172a;--muted:#64748b;--primary:#7c3aed;--accent:#db2777}
+:root{
+  --bg:#05070f; --panel:rgba(255,255,255,.055); --panel2:rgba(255,255,255,.09);
+  --border:rgba(255,255,255,.12); --text:#eef2ff; --muted:#9aa7c7;
+  --violet:#7c3aed; --pink:#db2777; --cyan:#22d3ee; --green:#86efac;
+  --grad:linear-gradient(135deg,#7c3aed,#db2777 55%,#f59e0b);
+}
 *{box-sizing:border-box}
-body{margin:0;font-family:system-ui,-apple-system,"Noto Sans Myanmar",sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
-a{color:var(--primary)}
-.top{position:sticky;top:0;z-index:10;background:rgba(255,255,255,.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
-.topin{max-width:920px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px}
-.logo{font-weight:900;letter-spacing:-.02em}.logo span{color:var(--accent)}
-.wrap{max-width:920px;margin:0 auto;padding:20px 16px 48px}
-.card{background:var(--card);border:1px solid var(--border);border-radius:16px;box-shadow:0 1px 3px rgba(15,23,42,.06),0 8px 24px rgba(15,23,42,.06);padding:20px}
-.liquid{position:relative;overflow:hidden}
-.liquid>*{position:relative;z-index:1}
-.liquid::before{content:"";position:absolute;inset:0 0 auto 0;height:56%;background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(255,255,255,0));pointer-events:none}
-.liquid::after{content:"";position:absolute;top:0;left:-60%;width:40%;height:100%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.55),transparent);transform:skewX(-18deg);transition:left .6s}
-.liquid:hover::after{left:120%}
-h1{font-size:30px;line-height:1.25;margin:8px 0}h2{font-size:21px;margin:0 0 8px}h3{font-size:17px;margin:16px 0 6px}
-p{color:#334155}.muted{color:var(--muted);font-size:15px}
-.badge{display:inline-block;background:#eef2ff;color:#4338ca;border:1px solid #ddd6fe;padding:4px 10px;border-radius:999px;font-size:13px;font-weight:700}
-.btn{display:inline-flex;align-items:center;gap:6px;border:0;cursor:pointer;text-decoration:none;font-weight:800;padding:11px 18px;border-radius:12px;color:#fff;background:linear-gradient(180deg,#c4b5fd,#7c3aed 55%,#6d28d9);box-shadow:inset 0 1px 0 rgba(255,255,255,.6),0 10px 20px rgba(124,58,237,.35);transition:transform .1s,box-shadow .1s}
-.btn:active{transform:translateY(2px);box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 4px 10px rgba(124,58,237,.3)}
-.btn2{background:#fff;color:var(--text);border:1px solid var(--border);box-shadow:0 1px 3px rgba(15,23,42,.08)}
-.btn2:active{transform:translateY(1px)}
-.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0}
-.mini{padding:16px}.mini b{font-size:22px}.mini p{margin:6px 0 0;font-size:14px}
-.steps{display:grid;gap:12px;margin-top:14px}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:system-ui,-apple-system,"Noto Sans Myanmar","Segoe UI",sans-serif;color:var(--text);line-height:1.65;
+  background:
+    radial-gradient(900px 500px at 85% -5%,rgba(124,58,237,.35),transparent 60%),
+    radial-gradient(800px 500px at -10% 30%,rgba(34,211,238,.18),transparent 60%),
+    radial-gradient(700px 500px at 60% 110%,rgba(219,39,119,.22),transparent 60%),
+    var(--bg);}
+#bg{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:.9}
+a{color:#c4b5fd}
+.top{position:sticky;top:0;z-index:20;background:rgba(5,7,15,.72);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid var(--border)}
+.topin{max-width:960px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:900;letter-spacing:-.02em;font-size:19px}
+.logo .mark{width:34px;height:34px;flex:0 0 34px}
+.logo span{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.wrap{position:relative;z-index:1;max-width:960px;margin:0 auto;padding:24px 16px 56px}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:20px;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  box-shadow:0 10px 40px rgba(0,0,0,.45);padding:22px}
+.hero{position:relative;overflow:hidden}
+.hero::before{content:"";position:absolute;inset:-40% -20% auto -20%;height:70%;
+  background:radial-gradient(closest-side,rgba(124,58,237,.45),rgba(219,39,119,.18),transparent);filter:blur(10px);pointer-events:none}
+.hero>*{position:relative;z-index:1}
+.hero-top{display:flex;gap:18px;align-items:flex-start}
+.claw{flex:0 0 92px;width:92px;height:112px;filter:drop-shadow(0 0 18px rgba(124,58,237,.65))}
+.claw .ring{transform-origin:50% 50%;animation:spin 14s linear infinite}
+.claw .stroke{stroke-dasharray:120;stroke-dashoffset:120;animation:draw 1.6s ease forwards}
+.claw .s2{animation-delay:.25s}.claw .s3{animation-delay:.5s}
+@keyframes draw{to{stroke-dashoffset:0}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.badge{display:inline-flex;align-items:center;gap:6px;background:rgba(124,58,237,.18);border:1px solid rgba(196,181,253,.4);color:#ddd6fe;
+  padding:5px 12px;border-radius:999px;font-size:13px;font-weight:700}
+.badge .dot{width:7px;height:7px;border-radius:50%;background:var(--cyan);box-shadow:0 0 10px var(--cyan);animation:pulse 1.8s ease-in-out infinite}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.5);opacity:.6}}
+h1{font-size:34px;line-height:1.2;margin:12px 0 8px;letter-spacing:-.02em}
+h1 .grad{background:linear-gradient(90deg,#c4b5fd,#f0abfc,#67e8f9,#c4b5fd);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shimmer 6s linear infinite}
+@keyframes shimmer{to{background-position:200% 0}}
+h2{font-size:22px;margin:0 0 10px}
+h3{font-size:17px;margin:14px 0 6px}
+p{color:#cbd5e1}.muted{color:var(--muted);font-size:15px}
+.btn{position:relative;overflow:hidden;display:inline-flex;align-items:center;gap:8px;border:0;cursor:pointer;text-decoration:none;font-weight:800;
+  padding:12px 20px;border-radius:14px;color:#fff;background:linear-gradient(180deg,#c4b5fd,#7c3aed 55%,#6d28d9);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.6),inset 0 -2px 6px rgba(0,0,0,.25),0 12px 26px rgba(124,58,237,.4);
+  transition:transform .12s,box-shadow .12s}
+.btn::after{content:"";position:absolute;top:0;left:-70%;width:45%;height:100%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.55),transparent);transform:skewX(-18deg);transition:left .55s}
+.btn:hover::after{left:130%}
+.btn:active{transform:translateY(2px);box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 5px 12px rgba(124,58,237,.3)}
+.btn2{background:var(--panel2);color:var(--text);border:1px solid var(--border);box-shadow:0 4px 14px rgba(0,0,0,.35)}
+.btn2::after{background:linear-gradient(100deg,transparent,rgba(255,255,255,.25),transparent)}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:18px 0}
+.mini{padding:20px;transition:transform .25s,border-color .25s,box-shadow .25s}
+.mini:hover{transform:translateY(-4px);border-color:rgba(196,181,253,.45);box-shadow:0 16px 40px rgba(124,58,237,.25)}
+.mini .ic{width:46px;height:46px;display:grid;place-items:center;border-radius:14px;
+  background:linear-gradient(135deg,rgba(124,58,237,.35),rgba(219,39,119,.3));border:1px solid rgba(196,181,253,.35);
+  animation:float 3.4s ease-in-out infinite}
+.mini:nth-child(2) .ic{animation-delay:.5s}.mini:nth-child(3) .ic{animation-delay:1s}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.mini b{font-size:19px}.mini p{margin:8px 0 0;font-size:14px}
+.steps{display:grid;grid-template-columns:minmax(0,1fr);gap:14px;margin-top:16px}
 .step{display:flex;gap:14px;align-items:flex-start}
-.num{flex:0 0 36px;height:36px;border-radius:50%;display:grid;place-items:center;background:#0f172a;color:#fff;font-weight:900}
-.seg{display:flex;gap:4px;background:#eef2ff;border:1px solid #e0e7ff;padding:4px;border-radius:12px;overflow-x:auto;margin:16px 0}
-.seg button{white-space:nowrap;border:0;background:transparent;padding:9px 13px;border-radius:9px;cursor:pointer;font-weight:700;color:#475569}
-.seg button.active{background:#fff;color:#0f172a;box-shadow:0 1px 4px rgba(15,23,42,.15)}
-.tab{display:none}.tab.active{display:block}
-code{background:#f1f5f9;padding:2px 6px;border-radius:6px;word-break:break-all;font-size:14px}
-.cmd{position:relative;background:#0f172a;color:#e2e8f0;border-radius:12px;padding:14px 54px 14px 14px;overflow:auto;margin:10px 0}
-.cmd code{background:none;padding:0;color:#86efac;font-family:ui-monospace,monospace}
-.copy{position:absolute;right:8px;top:8px;background:#fff;color:#0f172a;border:1px solid var(--border);padding:6px 10px;border-radius:999px;font-weight:700;cursor:pointer}
-.warn{background:#fefce8;border:1px solid #fde68a;padding:12px;border-radius:12px;color:#713f12}
-footer{color:var(--muted);font-size:14px;margin-top:20px}
-@media(max-width:700px){.grid{grid-template-columns:1fr}h1{font-size:25px}.topin{flex-wrap:wrap}}
+.step>div{min-width:0}
+.num{flex:0 0 38px;height:38px;border-radius:50%;display:grid;place-items:center;font-weight:900;color:#fff;
+  background:linear-gradient(135deg,#7c3aed,#db2777);box-shadow:0 0 0 4px rgba(124,58,237,.18),0 6px 16px rgba(219,39,119,.35)}
+.seg{position:sticky;top:61px;z-index:15;display:flex;gap:5px;background:rgba(5,7,15,.8);border:1px solid var(--border);backdrop-filter:blur(14px);
+  padding:5px;border-radius:16px;overflow-x:auto;margin:18px 0;scrollbar-width:none}
+.seg::-webkit-scrollbar{display:none}
+.seg button{white-space:nowrap;border:0;background:transparent;padding:10px 14px;border-radius:11px;cursor:pointer;font-weight:700;color:var(--muted);font-size:14px;transition:all .2s}
+.seg button:hover{color:var(--text)}
+.seg button.active{background:var(--grad);color:#fff;box-shadow:0 6px 18px rgba(219,39,119,.35)}
+.tab{display:none}
+.tab.active{display:block;animation:fadeUp .4s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+code{background:rgba(255,255,255,.1);padding:2px 7px;border-radius:7px;word-break:break-all;font-size:14px;color:#fde68a}
+.cmd{position:relative;background:#0a0f1e;border:1px solid rgba(148,163,184,.25);border-radius:14px;padding:38px 16px 14px;overflow:auto;margin:12px 0;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 8px 24px rgba(0,0,0,.4)}
+.cmd::before{content:"";position:absolute;top:12px;left:14px;width:34px;height:10px;border-radius:6px;
+  background:radial-gradient(circle 4px at 5px 5px,#f87171 4px,transparent 5px),radial-gradient(circle 4px at 17px 5px,#fbbf24 4px,transparent 5px),radial-gradient(circle 4px at 29px 5px,#34d399 4px,transparent 5px)}
+.cmd code{background:none;padding:0;color:var(--green);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre}
+.copy{position:absolute;right:10px;top:8px;background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.2);padding:6px 12px;border-radius:999px;font-weight:700;cursor:pointer;font-size:13px;transition:background .2s}
+.copy:hover{background:rgba(255,255,255,.25)}
+.warn{background:rgba(254,252,232,.08);border:1px solid rgba(253,230,138,.4);padding:13px 15px;border-radius:13px;color:#fde68a}
+footer{color:var(--muted);font-size:14px;margin-top:22px;text-align:center}
+.wave{display:block;width:100%;height:34px;margin:26px 0 0;opacity:.55}
+.wave path{animation:waveMove 5s ease-in-out infinite alternate}
+@keyframes waveMove{from{transform:translateX(-12px)}to{transform:translateX(12px)}}
+.reveal{opacity:0;transform:translateY(16px);transition:opacity .6s ease,transform .6s ease}
+.reveal.in{opacity:1;transform:none}
+@media(max-width:700px){.grid{grid-template-columns:1fr}h1{font-size:27px}.hero-top{flex-direction:column}.claw{width:72px;height:88px;flex-basis:72px}.topin{flex-wrap:wrap}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.reveal{opacity:1;transform:none}}
 </style>
 </head>
 <body>
-<div class="top"><div class="topin"><div class="logo">OpenClaw <span>Guide</span></div><a class="btn" href="quick.html" style="padding:8px 14px">⚡ Quick Start</a></div></div>
+<canvas id="bg" aria-hidden="true"></canvas>
+<div class="top"><div class="topin">
+  <div class="logo">
+    <svg class="mark" viewBox="0 0 110 140" fill="none" aria-hidden="true">
+      <defs><linearGradient id="lg1" x1="0" y1="0" x2="110" y2="140"><stop stop-color="#a78bfa"/><stop offset=".55" stop-color="#db2777"/><stop offset="1" stop-color="#22d3ee"/></linearGradient></defs>
+      <circle class="ring" cx="55" cy="70" r="62" stroke="url(#lg1)" stroke-width="1.5" stroke-dasharray="4 9" opacity=".55"/>
+      <path class="stroke" d="M22 62 Q48 12 84 20" stroke="url(#lg1)" stroke-width="8" stroke-linecap="round"/>
+      <path class="stroke s2" d="M16 88 Q46 42 90 50" stroke="url(#lg1)" stroke-width="8" stroke-linecap="round"/>
+      <path class="stroke s3" d="M22 114 Q52 72 92 80" stroke="url(#lg1)" stroke-width="8" stroke-linecap="round"/>
+    </svg>
+    OpenClaw <span>Guide</span>
+  </div>
+  <a class="btn" href="quick.html" style="padding:9px 15px">⚡ Quick Start</a>
+</div></div>
 <div class="wrap">
 
-<div class="card liquid">
-<span class="badge">VPS • Custom Base URL • GUI • Telegram • Browser</span>
-<h1>OpenClaw ကို ၃ ဆင့်နဲ့ စတင်ပါ</h1>
-<p>လူတိုင်း ကြည့်ပြီး လုပ်လို့ရအောင် လုပ်ထားတဲ့ လမ်းညွှန်။ အဆင့်တွေ များများ မလိုဘူး။</p>
-<div class="steps">
-<div class="step"><div class="num">1</div><div><b>Install လုပ်</b><div class="cmd"><code>curl -fsSL https://openclaw.ai/install.sh | bash</code><button class="copy" onclick="copy(this)">Copy</button></div><span class="muted">Windows: PowerShell မှာ <code>iwr -useb https://openclaw.ai/install.ps1 | iex</code></span></div></div>
-<div class="step"><div class="num">2</div><div><b>Custom Base URL ထည့်</b><div class="cmd"><code>openclaw onboard --classic --install-daemon</code><button class="copy" onclick="copy(this)">Copy</button></div><span class="muted">Wizard မှာ Custom Provider ရွေးပြီး Base URL, key, model ထည့်ပါ။ (Custom Provider only appears with --classic.)</span></div></div>
-<div class="step"><div class="num">3</div><div><b>သုံးတော့</b><div class="cmd"><code>openclaw dashboard</code><button class="copy" onclick="copy(this)">Copy</button></div><span class="muted">Browser မှာ <code>http://127.0.0.1:18789/</code> ပွင့်လာမယ်။</span></div></div>
-</div>
-<p><a class="btn" href="quick.html">Quick Start Page →</a> <a class="btn btn2" href="openclaw-guide.pdf">PDF Download</a></p>
+<div class="card hero">
+  <div class="hero-top">
+    <svg class="claw" viewBox="0 0 110 140" fill="none" aria-hidden="true">
+      <defs><linearGradient id="lg2" x1="0" y1="0" x2="110" y2="140"><stop stop-color="#a78bfa"/><stop offset=".55" stop-color="#db2777"/><stop offset="1" stop-color="#22d3ee"/></linearGradient></defs>
+      <circle class="ring" cx="55" cy="70" r="62" stroke="url(#lg2)" stroke-width="1.5" stroke-dasharray="4 9" opacity=".55"/>
+      <path class="stroke" d="M22 62 Q48 12 84 20" stroke="url(#lg2)" stroke-width="8" stroke-linecap="round"/>
+      <path class="stroke s2" d="M16 88 Q46 42 90 50" stroke="url(#lg2)" stroke-width="8" stroke-linecap="round"/>
+      <path class="stroke s3" d="M22 114 Q52 72 92 80" stroke="url(#lg2)" stroke-width="8" stroke-linecap="round"/>
+    </svg>
+    <div>
+      <span class="badge"><span class="dot"></span>VPS • Custom Base URL • GUI • Telegram • Browser</span>
+      <h1>OpenClaw ကို <span class="grad">၃ ဆင့်နဲ့</span> စတင်ပါ</h1>
+      <p>လူတိုင်း ကြည့်ပြီး လုပ်လို့ရအောင် လုပ်ထားတဲ့ လမ်းညွှန်။ အဆင့်တွေ များများ မလိုဘူး။</p>
+    </div>
+  </div>
+  <div class="steps">
+    <div class="step"><div class="num">1</div><div><b>Install လုပ်</b><div class="cmd"><code>curl -fsSL https://openclaw.ai/install.sh | bash</code><button class="copy" onclick="copy(this)">Copy</button></div><span class="muted">Windows: PowerShell မှာ <code>iwr -useb https://openclaw.ai/install.ps1 | iex</code></span></div></div>
+    <div class="step"><div class="num">2</div><div><b>Custom Base URL ထည့်</b><div class="cmd"><code>openclaw onboard --classic --install-daemon</code><button class="copy" onclick="copy(this)">Copy</button></div><span class="muted">Wizard မှာ Custom Provider ရွေးပြီး Base URL, key, model ထည့်ပါ။ (Custom Provider only appears with --classic.)</span></div></div>
+    <div class="step"><div class="num">3</div><div><b>သုံးတော့</b><div class="cmd"><code>openclaw dashboard</code><button class="copy" onclick="copy(this)">Copy</button></div><span class="muted">Browser မှာ <code>http://127.0.0.1:18789/</code> ပွင့်လာမယ်။</span></div></div>
+  </div>
+  <p><a class="btn" href="quick.html">Quick Start Page →</a> <a class="btn btn2" href="openclaw-guide.pdf">PDF Download</a></p>
 </div>
 
+<svg class="wave" viewBox="0 0 960 34" preserveAspectRatio="none" aria-hidden="true"><path d="M0 17 Q120 2 240 17 T480 17 T720 17 T960 17" fill="none" stroke="url(#lg2)" stroke-width="2" opacity=".6"/></svg>
+
 <div class="grid">
-<div class="card mini"><b>🔑</b><h3>ကိုယ့် API</h3><p>Base URL ကို ကိုယ်တိုင် ရွေးပါ။ key က ကိုယ့်ဆီမှာပဲ ရှိတယ်။</p></div>
-<div class="card mini"><b>💬</b><h3>GUI + Telegram</h3><p>Browser dashboard နဲ့ Telegram bot နှစ်မျိုးလုံးကနေ သုံးလို့ရတယ်။</p></div>
-<div class="card mini"><b>🖥️</b><h3>Windows / Linux / VM</h3><p>OS တိုင်းမှာ တူတဲ့ အလုပ်လုပ်ပုံနဲ့ သုံးလို့ရတယ်။</p></div>
+  <div class="card mini reveal"><div class="ic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#e9d5ff" stroke-width="2" stroke-linecap="round"><circle cx="8" cy="15" r="4"/><path d="M10.9 12.1 20 3M15 5l3 3M18 8l2 2"/></svg></div><h3>ကိုယ့် API</h3><p>Base URL ကို ကိုယ်တိုင် ရွေးပါ။ key က ကိုယ့်ဆီမှာပဲ ရှိတယ်။</p></div>
+  <div class="card mini reveal"><div class="ic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#e9d5ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-8 8H5l-2 2V12a8 8 0 0 1 8-8h2a8 8 0 0 1 8 8z"/></svg></div><h3>GUI + Telegram</h3><p>Browser dashboard နဲ့ Telegram bot နှစ်မျိုးလုံးကနေ သုံးလို့ရတယ်။</p></div>
+  <div class="card mini reveal"><div class="ic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#e9d5ff" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg></div><h3>Windows / Linux / VM</h3><p>OS တိုင်းမှာ တူတဲ့ အလုပ်လုပ်ပုံနဲ့ သုံးလို့ရတယ်။</p></div>
 </div>
 
 <nav class="seg" id="tabs">
@@ -121,7 +205,7 @@ openclaw gateway status</code><button class="copy" onclick="copy(this)">Copy</bu
 
 <section class="tab card" id="gui">
 <h2>GUI — Control UI</h2>
-<p>Local မှာ <code>openclaw dashboard</code> လို့ run ရင် <code>http://127.0.0.1:18789/</code> ပွင့်တယ်။ VPS ကို အဝေးကနေ သုံးချင်ရင် SSH tunnel, nginx + HTTPS + basic auth, ဒါမှမဟုတ် Tailscale ကို သုံးပါ။</p>
+<p>Local မှာ <code>openclaw dashboard</code> လို့ run ရင် <code>http://127.0.0.1:18789/</code> ပွင့်လာမယ်။ VPS ကို အဝေးကနေ သုံးချင်ရင် SSH tunnel, nginx + HTTPS + basic auth, ဒါမှမဟုတ် Tailscale ကို သုံးပါ။</p>
 <div class="cmd"><code>ssh -L 18789:127.0.0.1:18789 user@your-server-ip</code><button class="copy" onclick="copy(this)">Copy</button></div>
 </section>
 
@@ -177,6 +261,54 @@ document.querySelectorAll('#tabs button').forEach(function(b){
   });
 });
 function copy(btn){var t=btn.parentElement.querySelector('code').innerText;if(navigator.clipboard){navigator.clipboard.writeText(t).then(function(){btn.innerText='Copied ✓';setTimeout(function(){btn.innerText='Copy'},1500)})}}
+/* Scroll reveal */
+var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{threshold:.12});
+document.querySelectorAll('.reveal').forEach(function(el){io.observe(el)});
+/* Three.js particle background */
+(function(){
+  if(typeof THREE==='undefined'){return}
+  var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var canvas=document.getElementById('bg');
+  var renderer;
+  try{renderer=new THREE.WebGLRenderer({canvas:canvas,alpha:true,antialias:true})}catch(e){return}
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+  var scene=new THREE.Scene();
+  var camera=new THREE.PerspectiveCamera(60,innerWidth/innerHeight,0.1,100);
+  camera.position.z=14;
+  var N=420,pos=new Float32Array(N*3),col=new Float32Array(N*3);
+  var palette=[[0.65,0.55,0.98],[0.86,0.15,0.47],[0.13,0.83,0.93]];
+  for(var i=0;i<N;i++){
+    pos[i*3]=(Math.random()-0.5)*34;
+    pos[i*3+1]=(Math.random()-0.5)*20;
+    pos[i*3+2]=(Math.random()-0.5)*14-4;
+    var c=palette[i%3];
+    col[i*3]=c[0];col[i*3+1]=c[1];col[i*3+2]=c[2];
+  }
+  var geo=new THREE.BufferGeometry();
+  geo.setAttribute('position',new THREE.BufferAttribute(pos,3));
+  geo.setAttribute('color',new THREE.BufferAttribute(col,3));
+  var mat=new THREE.PointsMaterial({size:0.14,vertexColors:true,transparent:true,opacity:0.85,blending:THREE.AdditiveBlending,depthWrite:false});
+  var points=new THREE.Points(geo,mat);
+  scene.add(points);
+  var mx=0,my=0;
+  window.addEventListener('pointermove',function(e){mx=(e.clientX/innerWidth-0.5);my=(e.clientY/innerHeight-0.5)});
+  function resize(){renderer.setSize(innerWidth,innerHeight);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix()}
+  window.addEventListener('resize',resize);resize();
+  if(reduce){renderer.render(scene,camera);return}
+  var t=0,raf;
+  function tick(){
+    t+=0.0016;
+    points.rotation.y=t*0.9+mx*0.35;
+    points.rotation.x=Math.sin(t*0.7)*0.08+my*0.22;
+    points.position.y=Math.sin(t*1.4)*0.35;
+    renderer.render(scene,camera);
+    raf=requestAnimationFrame(tick);
+  }
+  tick();
+  document.addEventListener('visibilitychange',function(){
+    if(document.hidden){cancelAnimationFrame(raf)}else{tick()}
+  });
+})();
 </script>
 </body>
 </html>
