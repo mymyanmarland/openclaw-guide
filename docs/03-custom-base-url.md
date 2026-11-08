@@ -1,7 +1,7 @@
 # 03 — Custom Base URL
 
 ## Wizard နည်း
-`openclaw onboard` မှာ Custom Provider ကို ရွေးပါ။
+`openclaw onboard --classic --install-daemon` မှာ Custom Provider ကို ရွေးပါ။
 Compatibility ကို OpenAI-compatible လို့ ရွေးပါ။
 Base URL, API key, Model ID ကို ထည့်ပါ။
 
