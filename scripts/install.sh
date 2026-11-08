@@ -6,7 +6,9 @@
 # The script then does everything: install, key/model verify, config
 # backup + provider write (with model name, required by OpenClaw
 # 2026.11.1+), config validate, Telegram channel, gateway start,
-# wait until the gateway answers, channel probe, and a short summary.
+# wait until the gateway answers, save the API key to OpenClaw's auth
+# store (inference reads the auth profile, not the config), channel
+# probe, and a short summary.
 # Keys are never printed and never written to git or shell history.
 #
 # Usage:
@@ -236,6 +238,21 @@ else
   : > "$GATEWAY_LOG"  # clear any stale log, so a blocked-start check reads this run only
   nohup openclaw gateway run > "$GATEWAY_LOG" 2>&1 &
   wait_for_gateway 150 || die "Gateway did not come up. See /tmp/openclaw-gateway.log for the reason."
+fi
+
+# 5b. Save the API key to OpenClaw's auth store. Verifying the key
+# against /models only proves it is valid — the agent signs in to the
+# AI service from the auth profile, not from the config. Without this
+# step the bot replies "Couldn't sign in to the AI service." Do NOT
+# put the key in models.providers.<id>.apiKey: OpenClaw reports it
+# "unresolved in the active runtime snapshot". Pipe the key on stdin
+# (the documented pattern); while the gateway is running the CLI
+# hands it to the gateway, which saves it without a restart.
+say "Saving the API key to OpenClaw's auth store..."
+if printf '%s' "$API_KEY" | openclaw models auth paste-api-key --provider "$PROVIDER_NAME" 2>/dev/null; then
+  say "API key saved to the auth store."
+else
+  say "Warning: could not save the API key to the auth store. The agent will not be able to answer until you run: openclaw models auth paste-api-key --provider $PROVIDER_NAME"
 fi
 
 # 6. Probe channels (best effort — a failed probe does not undo the install).
