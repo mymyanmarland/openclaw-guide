@@ -4,7 +4,7 @@
 
 ```bash
 curl -fsSL https://openclaw.ai/install.sh | bash
-openclaw onboard --install-daemon
+openclaw onboard --classic --install-daemon
 openclaw gateway status
 openclaw dashboard
 ```
