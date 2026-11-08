@@ -2,6 +2,6 @@
   <rect width="1200" height="180" rx="16" fill="#0b1026"/>
   <circle cx="40" cy="30" r="9" fill="#ff5f56"/><circle cx="70" cy="30" r="9" fill="#ffbd2e"/><circle cx="100" cy="30" r="9" fill="#27c93f"/>
   <text x="40" y="80" font-family="monospace" font-size="22" fill="#7ee787">$ curl -fsSL https://openclaw.ai/install.sh | bash</text>
-  <text x="40" y="120" font-family="monospace" font-size="22" fill="#7ee787">$ openclaw onboard --install-daemon</text>
+  <text x="40" y="120" font-family="monospace" font-size="22" fill="#7ee787">$ openclaw onboard --classic --install-daemon</text>
   <text x="40" y="160" font-family="monospace" font-size="22" fill="#ffd166">$ openclaw dashboard  # http://127.0.0.1:18789/</text>
 </svg>
