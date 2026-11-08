@@ -36,8 +36,9 @@ function Wait-Gateway {
       Write-Host 'Gateway is up (listening on 127.0.0.1:18789).'
       return $true
     }
-    Start-Sleep -Seconds 5
     $waited += 5
+    Write-Host "Waiting for the gateway to answer... ($waited sec / $MaxSeconds sec)"
+    Start-Sleep -Seconds 5
   }
   return $false
 }
