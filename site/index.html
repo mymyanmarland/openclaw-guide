@@ -91,7 +91,7 @@ bash scripts/install.sh --base-url https://api.example.com/v1 --model your-model
 cd openclaw-guide
 .\scripts\install.ps1 -BaseUrl https://api.example.com/v1 -Model your-model-id</code><button class="copy" onclick="copy(this)">Copy</button></div>
 <p class="muted">First clone the repo — the script is inside it. Replace https://api.example.com/v1 and your-model-id with your real Base URL and model.</p>
-<p class="muted">Script က လုပ်ပေးတာ။ ① official installer နဲ့ OpenClaw တင်တယ်။ ② key ကို <code>/models</code> နဲ့ စစ်တယ်။ ③ config ကို backup ယူပြီးမှ provider ထည့်တယ်။ ④ Telegram token ပေးရင် channel ထည့်တယ်။ ⑤ Gateway ကို စစ်တယ်။<br>အရင် စမ်းချင်ရင် <code>--dry-run</code> (Linux) / <code>-DryRun</code> (Windows) နဲ့ စမ်းပါ။ ဘာမှ မပြောင်းဘူး။</p>
+<p class="muted">Script က လုပ်ပေးတာ။ ① official installer နဲ့ OpenClaw တင်တယ်။ ② key ကို <code>/models</code> နဲ့ စစ်တယ်။ ③ config ကို backup ယူပြီးမှ provider ထည့်တယ်။ ④ Telegram token ပေးရင် channel ထည့်တယ်။ ⑤ Starts the Gateway and waits until it is ready. ⑥ Probes the channels.<br>အရင် စမ်းချင်ရင် <code>--dry-run</code> (Linux) / <code>-DryRun</code> (Windows) နဲ့ စမ်းပါ။ ဘာမှ မပြောင်းဘူး။</p>
 </section>
 
 <section class="tab card" id="vps">
