@@ -13,6 +13,9 @@
   "agents": {
     "defaults": {
       "model": { "primary": "myprovider/your-model-id" }
+    },
+    "entries": {
+      "main": { "workspace": "~/.openclaw/workspace" }
     }
   }
 }
