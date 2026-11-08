@@ -55,14 +55,16 @@ gateway_ready() {
 
 wait_for_gateway() {
   # $1 = max seconds to wait (default 150). A cold gateway takes ~40s.
+  # Prints progress every poll so the terminal never looks stuck.
   local max="${1:-150}" waited=0
   while [ "$waited" -lt "$max" ]; do
     if gateway_ready; then
       say "Gateway is up (listening on 127.0.0.1:18789)."
       return 0
     fi
-    sleep 5
     waited=$((waited + 5))
+    say "Waiting for the gateway to answer... (${waited}s / ${max}s)"
+    sleep 5
   done
   return 1
 }
@@ -185,6 +187,7 @@ if gateway_ready; then
   openclaw gateway restart 2>/dev/null || true
   wait_for_gateway 150 || die "Gateway did not come back up after restart. Run 'openclaw gateway status --deep' and check /tmp/openclaw/openclaw-$(date +%Y-%m-%d).log"
 else
+  say "Starting the gateway (a cold start takes ~40s, please wait)..."
   openclaw gateway install 2>/dev/null || true
   openclaw gateway start 2>/dev/null || true
   if ! wait_for_gateway 60; then
